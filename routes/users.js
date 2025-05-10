@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var service = require('../services/users');
 var private = require('../middlewares/private');
+const User = require('../models/user');
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true },
@@ -26,7 +27,14 @@ router.delete('/:id', private.checkJWT, service.delete);
 router.post('/authenticate', service.authenticate);
 
 
-
+router.get('/', async function (req, res, next) {
+  try {
+    const users = await User.find({}, '-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
+  }
+});
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
