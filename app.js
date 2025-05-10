@@ -9,6 +9,7 @@ var cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var filesRouter = require('./routes/files');
+var catwaysRouter = require('./routes/catways');
 const { default: mongoose } = require('mongoose');
 
 var mongodb = require('./db/mongoose');
@@ -32,10 +33,11 @@ app.use(cors({
     exposedHeaders: ['Authorization'],
     origin: '*'
 }));
-
+app.use('/catways', catwaysRouter);
 // Routes API
 app.use('/users', usersRouter);
 app.use('/files', filesRouter);
+
 
 // Fichiers statiques
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

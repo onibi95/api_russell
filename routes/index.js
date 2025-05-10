@@ -17,6 +17,11 @@ router.get('/dashboard', (req, res) => {
   res.render('dashboard');
 });
 
+// Route catways (vue)
+router.get('/catways', (req, res) => {
+  res.render('catways');
+});
+
 router.use('/users', userRoute);
 
 module.exports = router;

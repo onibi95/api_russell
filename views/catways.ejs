@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Catways</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Gestion des Catways</h2>
+        <button class="btn btn-success mb-3" onclick="showCatwayForm()">Ajouter un catway</button>
+        <button class="btn btn-secondary mb-3" onclick="loadCatways()">Test fetch manuel</button>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Numéro</th>
+                    <th>Type</th>
+                    <th>État</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="catwaysTableBody"></tbody>
+        </table>
+
+        <!-- Formulaire catway (ajout/modif) -->
+        <div id="catwayFormContainer" style="display:none;">
+            <h4 id="formTitle">Ajouter un catway</h4>
+            <form id="catwayForm">
+                <input type="hidden" id="catwayId">
+                <div class="mb-3">
+                    <label for="catwayNumber" class="form-label">Numéro</label>
+                    <input type="number" class="form-control" id="catwayNumber" required>
+                </div>
+                <div class="mb-3">
+                    <label for="catwayType" class="form-label">Type</label>
+                    <select class="form-control" id="catwayType" required>
+                        <option value="long">Long</option>
+                        <option value="short">Short</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="catwayState" class="form-label">État</label>
+                    <input type="text" class="form-control" id="catwayState" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Valider</button>
+                <button type="button" class="btn btn-secondary" onclick="hideCatwayForm()">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Afficher/Masquer le formulaire
+        function showCatwayForm(catway = null) {
+            document.getElementById('catwayFormContainer').style.display = 'block';
+            document.getElementById('formTitle').textContent = catway ? 'Modifier un catway' : 'Ajouter un catway';
+            document.getElementById('catwayId').value = catway ? catway._id : '';
+            document.getElementById('catwayNumber').value = catway ? catway.catwayNumber : '';
+            document.getElementById('catwayType').value = catway ? catway.catwayType : 'long';
+            document.getElementById('catwayState').value = catway ? catway.catwayState : '';
+        }
+        function hideCatwayForm() {
+            document.getElementById('catwayFormContainer').style.display = 'none';
+        }
+
+        // Charger les catways
+        async function loadCatways() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                document.getElementById('catwaysTableBody').innerHTML = '<tr><td colspan="4" class="text-danger text-center">Vous devez être connecté pour voir les catways.</td></tr>';
+                return;
+            }
+            try {
+                const res = await fetch('/catways', {
+                    headers: { 'Authorization': token.startsWith('Bearer') ? token : 'Bearer ' + token },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        document.getElementById('catwaysTableBody').innerHTML = '<tr><td colspan="4" class="text-danger text-center">Accès refusé : token invalide ou expiré.</td></tr>';
+                        return;
+                    } else {
+                        document.getElementById('catwaysTableBody').innerHTML = '<tr><td colspan="4" class="text-danger text-center">Erreur lors du chargement des catways.</td></tr>';
+                        return;
+                    }
+                }
+                const catways = await res.json();
+                const tbody = document.getElementById('catwaysTableBody');
+                if (!catways.length) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">Aucun catway trouvé.</td></tr>';
+                } else {
+                    tbody.innerHTML = catways.map(c => `
+                        <tr>
+                            <td>${c.catwayNumber}</td>
+                            <td>${c.catwayType}</td>
+                            <td>${c.catwayState}</td>
+                            <td>
+                                <button class='btn btn-warning btn-sm' onclick='showCatwayForm(${JSON.stringify(c)})'>Modifier</button>
+                                <button class='btn btn-danger btn-sm' onclick='deleteCatway("${c._id}")'>Supprimer</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                document.getElementById('catwaysTableBody').innerHTML = '<tr><td colspan="4" class="text-danger text-center">Erreur réseau ou serveur.</td></tr>';
+            }
+        }
+
+        // Ajouter/Modifier catway
+        document.getElementById('catwayForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            if (!token) window.location.href = '/';
+            const id = document.getElementById('catwayId').value;
+            const method = id ? 'PATCH' : 'POST';
+            const url = id ? `/catways/${id}` : '/catways';
+            const body = {
+                catwayNumber: document.getElementById('catwayNumber').value,
+                catwayType: document.getElementById('catwayType').value,
+                catwayState: document.getElementById('catwayState').value
+            };
+            console.log('TOKEN ENVOYE:', token);
+            await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json', 'Authorization': token.startsWith('Bearer') ? token : 'Bearer ' + token },
+                credentials: 'same-origin',
+                body: JSON.stringify(body)
+            });
+            hideCatwayForm();
+            loadCatways();
+        };
+
+        // Supprimer catway
+        async function deleteCatway(id) {
+            const token = localStorage.getItem('token');
+            if (!token) window.location.href = '/';
+            if (!confirm('Supprimer ce catway ?')) return;
+            console.log('TOKEN ENVOYE:', token);
+            await fetch(`/catways/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': token.startsWith('Bearer') ? token : 'Bearer ' + token },
+                credentials: 'same-origin'
+            });
+            loadCatways();
+        }
+
+        window.addEventListener('DOMContentLoaded', loadCatways);
+    </script>
+</body>
+
+</html>
