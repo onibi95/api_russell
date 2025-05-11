@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Réservations - Port de Plaisance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+            color: white;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, .8);
+        }
+
+        .nav-link:hover {
+            color: white;
+        }
+
+        .reservation-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .reservation-table th {
+            background-color: #343a40;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0 sidebar">
+                <div class="p-3">
+                    <h4 class="text-center mb-4">Port de Plaisance</h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">
+                                <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/catways">
+                                <i class="fas fa-ship me-2"></i>Catways
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/reservations">
+                                <i class="fas fa-calendar-alt me-2"></i>Réservations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/users">
+                                <i class="fas fa-users me-2"></i>Utilisateurs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/api-docs" target="_blank">
+                                <i class="fas fa-book me-2"></i>Documentation API
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link text-danger" href="/logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <h2 class="mb-4">Gestion des Réservations</h2>
+
+                <!-- Formulaire de réservation -->
+                <div class="card reservation-form">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nouvelle Réservation</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="reservationForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="catwayNumber" class="form-label">Catway</label>
+                                    <select class="form-select" id="catwayNumber" required>
+                                        <!-- Les catways seront chargés dynamiquement -->
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="clientName" class="form-label">Nom du Client</label>
+                                    <input type="text" class="form-control" id="clientName" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="boatName" class="form-label">Nom du Bateau</label>
+                                    <input type="text" class="form-control" id="boatName" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="startDate" class="form-label">Date de début</label>
+                                    <input type="date" class="form-control" id="startDate" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="endDate" class="form-label">Date de fin</label>
+                                    <input type="date" class="form-control" id="endDate" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tableau des réservations -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des Réservations</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover reservation-table">
+                                <thead>
+                                    <tr>
+                                        <th>Catway</th>
+                                        <th>Client</th>
+                                        <th>Bateau</th>
+                                        <th>Arrivée</th>
+                                        <th>Départ</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (reservations && reservations.length> 0) { %>
+                                        <% reservations.forEach(function(reservation) { %>
+                                            <tr>
+                                                <td>
+                                                    <%= reservation.catwayNumber %>
+                                                </td>
+                                                <td>
+                                                    <%= reservation.clientName %>
+                                                </td>
+                                                <td>
+                                                    <%= reservation.boatName %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(reservation.startDate).toLocaleDateString('fr-FR') %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(reservation.endDate).toLocaleDateString('fr-FR') %>
+                                                </td>
+                                                <td>
+                                                    <button onclick="editReservation('<%= reservation._id %>')"
+                                                        class="btn btn-sm btn-warning">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button onclick="deleteReservation('<%= reservation._id %>')"
+                                                        class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="6" class="text-center">Aucune réservation trouvée
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Vérifier le token au chargement de la page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page chargée, vérification des données...');
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+
+            // Vérifier si les réservations sont présentes
+            const reservations = <% - JSON.stringify(reservations || []) %>;
+            console.log('Réservations disponibles:', reservations);
+
+            loadCatways();
+        });
+
+        // Charger les catways pour le select
+        async function loadCatways() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/catways', {
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+                const catways = await response.json();
+                const select = document.getElementById('catwayNumber');
+                select.innerHTML = '<option value="">Sélectionner un catway</option>';
+
+                catways.forEach(catway => {
+                    const option = document.createElement('option');
+                    option.value = catway.catwayNumber;
+                    option.textContent = `Catway ${catway.catwayNumber} (${catway.catwayType})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erreur lors du chargement des catways:', error);
+            }
+        }
+
+        // Gérer la soumission du formulaire
+        document.getElementById('reservationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch('/api/reservations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({
+                        catwayNumber: parseInt(document.getElementById('catwayNumber').value),
+                        clientName: document.getElementById('clientName').value,
+                        boatName: document.getElementById('boatName').value,
+                        startDate: new Date(document.getElementById('startDate').value).toISOString(),
+                        endDate: new Date(document.getElementById('endDate').value).toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('reservationForm').reset();
+                    window.location.reload(); // Recharger la page pour voir les nouvelles données
+                    alert('Réservation créée avec succès');
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Erreur lors de la création de la réservation');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la création de la réservation');
+            }
+        });
+
+        // Supprimer une réservation
+        async function deleteReservation(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?')) {
+                try {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch(`/api/reservations/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': token
+                        }
+                    });
+                    if (response.ok) {
+                        window.location.reload(); // Recharger la page pour voir les changements
+                        alert('Réservation supprimée avec succès');
+                    } else {
+                        alert('Erreur lors de la suppression de la réservation');
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la suppression de la réservation');
+                }
+            }
+        }
+
+        // Éditer une réservation
+        async function editReservation(id) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/reservations/${id}`, {
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+                const reservation = await response.json();
+
+                document.getElementById('catwayNumber').value = reservation.catwayNumber;
+                document.getElementById('clientName').value = reservation.clientName;
+                document.getElementById('boatName').value = reservation.boatName;
+                document.getElementById('startDate').value = reservation.startDate.split('T')[0];
+                document.getElementById('endDate').value = reservation.endDate.split('T')[0];
+
+                // Modifier le comportement du formulaire pour la mise à jour
+                const form = document.getElementById('reservationForm');
+                form.onsubmit = async (e) => {
+                    e.preventDefault();
+                    try {
+                        const updateResponse = await fetch(`/api/reservations/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': token
+                            },
+                            body: JSON.stringify({
+                                catwayNumber: parseInt(document.getElementById('catwayNumber').value),
+                                clientName: document.getElementById('clientName').value,
+                                boatName: document.getElementById('boatName').value,
+                                startDate: new Date(document.getElementById('startDate').value).toISOString(),
+                                endDate: new Date(document.getElementById('endDate').value).toISOString()
+                            })
+                        });
+
+                        if (updateResponse.ok) {
+                            form.reset();
+                            form.onsubmit = null; // Réinitialiser le gestionnaire d'événements
+                            window.location.reload(); // Recharger la page pour voir les changements
+                            alert('Réservation mise à jour avec succès');
+                        } else {
+                            const error = await updateResponse.json();
+                            alert(error.message || 'Erreur lors de la mise à jour de la réservation');
+                        }
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        alert('Erreur lors de la mise à jour de la réservation');
+                    }
+                };
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du chargement de la réservation');
+            }
+        }
+    </script>
+</body>
+
+</html>

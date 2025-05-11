@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Catways - Port de Plaisance</title>
+    <title>Gestion des Utilisateurs - Port de Plaisance</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -22,14 +22,14 @@
             color: white;
         }
 
-        .catway-form {
+        .user-form {
             background-color: #f8f9fa;
             padding: 20px;
             border-radius: 5px;
             margin-bottom: 20px;
         }
 
-        .catway-table th {
+        .user-table th {
             background-color: #343a40;
             color: white;
         }
@@ -50,7 +50,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="/catways">
+                            <a class="nav-link" href="/catways">
                                 <i class="fas fa-ship me-2"></i>Catways
                             </a>
                         </li>
@@ -60,7 +60,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/users">
+                            <a class="nav-link active" href="/users">
                                 <i class="fas fa-users me-2"></i>Utilisateurs
                             </a>
                         </li>
@@ -80,72 +80,81 @@
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 p-4">
-                <h2 class="mb-4">Gestion des Catways</h2>
+                <h2 class="mb-4">Gestion des Utilisateurs</h2>
 
-                <!-- Formulaire de catway -->
-                <div class="card catway-form">
+                <!-- Formulaire d'utilisateur -->
+                <div class="card user-form">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nouveau Catway</h5>
+                        <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Nouvel Utilisateur</h5>
                     </div>
                     <div class="card-body">
-                        <form id="catwayForm">
+                        <form id="userForm">
                             <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="catwayNumber" class="form-label">Numéro</label>
-                                    <input type="number" class="form-control" id="catwayNumber" required>
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="name" required>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="catwayType" class="form-label">Type</label>
-                                    <select class="form-select" id="catwayType" required>
-                                        <option value="long">Long</option>
-                                        <option value="short">Court</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="catwayState" class="form-label">État</label>
-                                    <input type="text" class="form-control" id="catwayState" required>
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstname" class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" id="firstname" required>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Mot de passe</label>
+                                    <input type="password" class="form-control" id="password" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-save me-2"></i>Enregistrer
+                                    </button>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
 
-                <!-- Tableau des catways -->
-                <div class="card mt-4">
+                <!-- Tableau des utilisateurs -->
+                <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des Catways</h5>
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des Utilisateurs</h5>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Numéro</th>
-                                        <th>Type</th>
-                                        <th>État</th>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Email</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% if (catways && catways.length> 0) { %>
-                                        <% catways.forEach(function(catway) { %>
+                                    <% if (users && users.length> 0) { %>
+                                        <% users.forEach(function(user) { %>
                                             <tr>
                                                 <td>
-                                                    <%= catway.catwayNumber %>
+                                                    <%= user.name %>
                                                 </td>
                                                 <td>
-                                                    <%= catway.catwayType %>
+                                                    <%= user.firstname %>
                                                 </td>
                                                 <td>
-                                                    <%= catway.catwayState %>
+                                                    <%= user.email %>
                                                 </td>
                                                 <td>
-                                                    <button onclick="editCatway('<%= catway._id %>')"
+                                                    <button onclick="editUser('<%= user._id %>')"
                                                         class="btn btn-sm btn-warning">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button onclick="deleteCatway('<%= catway._id %>')"
+                                                    <button onclick="deleteUser('<%= user._id %>')"
                                                         class="btn btn-sm btn-danger">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
@@ -154,7 +163,8 @@
                                             <% }); %>
                                                 <% } else { %>
                                                     <tr>
-                                                        <td colspan="4" class="text-center">Aucun catway trouvé</td>
+                                                        <td colspan="4" class="text-center">Aucun utilisateur trouvé
+                                                        </td>
                                                     </tr>
                                                     <% } %>
                                 </tbody>
@@ -175,115 +185,154 @@
                 window.location.href = '/';
                 return;
             }
+            loadUsers();
         });
 
+        // Charger les utilisateurs
+        async function loadUsers() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/users', {
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+                const users = await response.json();
+                const tableBody = document.getElementById('users-table-body');
+                tableBody.innerHTML = '';
+
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.name}</td>
+                        <td>${user.firstname}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <button onclick="editUser('${user._id}')" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteUser('${user._id}')" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erreur lors du chargement des utilisateurs:', error);
+            }
+        }
+
         // Gérer la soumission du formulaire
-        document.getElementById('catwayForm').addEventListener('submit', async (e) => {
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const token = localStorage.getItem('token');
 
             try {
-                const response = await fetch('/api/catways', {
+                const response = await fetch('/users', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': token
                     },
                     body: JSON.stringify({
-                        catwayNumber: parseInt(document.getElementById('catwayNumber').value),
-                        catwayType: document.getElementById('catwayType').value,
-                        catwayState: document.getElementById('catwayState').value
+                        name: document.getElementById('name').value,
+                        firstname: document.getElementById('firstname').value,
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value
                     })
                 });
 
                 if (response.ok) {
-                    document.getElementById('catwayForm').reset();
-                    window.location.reload(); // Recharger la page pour voir les changements
-                    alert('Catway créé avec succès');
+                    document.getElementById('userForm').reset();
+                    loadUsers();
+                    alert('Utilisateur créé avec succès');
                 } else {
                     const error = await response.json();
-                    alert(error.message || 'Erreur lors de la création du catway');
+                    alert(error.message || 'Erreur lors de la création de l\'utilisateur');
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('Erreur lors de la création du catway');
+                alert('Erreur lors de la création de l\'utilisateur');
             }
         });
 
-        // Supprimer un catway
-        async function deleteCatway(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce catway ?')) {
+        // Supprimer un utilisateur
+        async function deleteUser(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch(`/api/catways/${id}`, {
+                    const response = await fetch(`/users/${id}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': token
                         }
                     });
                     if (response.ok) {
-                        window.location.reload();
-                        alert('Catway supprimé avec succès');
+                        loadUsers();
+                        alert('Utilisateur supprimé avec succès');
                     } else {
-                        alert('Erreur lors de la suppression du catway');
+                        alert('Erreur lors de la suppression de l\'utilisateur');
                     }
                 } catch (error) {
                     console.error('Erreur:', error);
-                    alert('Erreur lors de la suppression du catway');
+                    alert('Erreur lors de la suppression de l\'utilisateur');
                 }
             }
         }
 
-        // Éditer un catway
-        async function editCatway(id) {
+        // Éditer un utilisateur
+        async function editUser(id) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/catways/${id}`, {
+                const response = await fetch(`/users/${id}`, {
                     headers: {
                         'Authorization': token
                     }
                 });
-                const catway = await response.json();
+                const user = await response.json();
 
-                document.getElementById('catwayNumber').value = catway.catwayNumber;
-                document.getElementById('catwayType').value = catway.catwayType;
-                document.getElementById('catwayState').value = catway.catwayState;
+                document.getElementById('name').value = user.name;
+                document.getElementById('firstname').value = user.firstname;
+                document.getElementById('email').value = user.email;
+                document.getElementById('password').value = ''; // Ne pas afficher le mot de passe
 
                 // Modifier le comportement du formulaire pour la mise à jour
-                const form = document.getElementById('catwayForm');
+                const form = document.getElementById('userForm');
                 form.onsubmit = async (e) => {
                     e.preventDefault();
                     try {
-                        const updateResponse = await fetch(`/api/catways/${id}`, {
+                        const updateResponse = await fetch(`/users/${id}`, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': token
                             },
                             body: JSON.stringify({
-                                catwayNumber: parseInt(document.getElementById('catwayNumber').value),
-                                catwayType: document.getElementById('catwayType').value,
-                                catwayState: document.getElementById('catwayState').value
+                                name: document.getElementById('name').value,
+                                firstname: document.getElementById('firstname').value,
+                                email: document.getElementById('email').value,
+                                password: document.getElementById('password').value || undefined // Ne pas envoyer si vide
                             })
                         });
 
                         if (updateResponse.ok) {
                             form.reset();
                             form.onsubmit = null; // Réinitialiser le gestionnaire d'événements
-                            window.location.reload();
-                            alert('Catway mis à jour avec succès');
+                            loadUsers();
+                            alert('Utilisateur mis à jour avec succès');
                         } else {
                             const error = await updateResponse.json();
-                            alert(error.message || 'Erreur lors de la mise à jour du catway');
+                            alert(error.message || 'Erreur lors de la mise à jour de l\'utilisateur');
                         }
                     } catch (error) {
                         console.error('Erreur:', error);
-                        alert('Erreur lors de la mise à jour du catway');
+                        alert('Erreur lors de la mise à jour de l\'utilisateur');
                     }
                 };
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('Erreur lors du chargement du catway');
+                alert('Erreur lors du chargement de l\'utilisateur');
             }
         }
     </script>

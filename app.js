@@ -8,8 +8,8 @@ var cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var filesRouter = require('./routes/files');
 var catwaysRouter = require('./routes/catways');
+var reservationsRouter = require('./routes/reservations');
 const { default: mongoose } = require('mongoose');
 
 var mongodb = require('./db/mongoose');
@@ -31,20 +31,20 @@ app.use(cookieParser());
 // Configuration CORS
 app.use(cors({
     exposedHeaders: ['Authorization'],
-    origin: '*'
+    origin: '*',
+    credentials: true
 }));
-app.use('/catways', catwaysRouter);
-// Routes API
-app.use('/users', usersRouter);
-app.use('/files', filesRouter);
-
 
 // Fichiers statiques
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes des vues (doivent être après les fichiers statiques)
+// Routes des vues (doivent être avant les routes API)
 app.use('/', indexRouter);
+
+// Routes API
+app.use('/api/catways', catwaysRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/reservations', reservationsRouter);
 
 // Gestion des erreurs 404
 app.use(function (req, res, next) {
