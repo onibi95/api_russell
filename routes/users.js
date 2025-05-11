@@ -26,14 +26,9 @@ router.delete('/:id', private.checkJWT, service.delete);
 
 router.post('/authenticate', service.authenticate);
 
-
-router.get('/', async function (req, res, next) {
-  try {
-    const users = await User.find({}, '-password');
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
-  }
+router.get('/', private.checkJWT, async (req, res) => {
+  const users = await service.getAllUsers();
+  res.json(users);
 });
 
 /* GET users listing. */
