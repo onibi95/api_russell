@@ -103,7 +103,7 @@ exports.authenticate = async (req, res, next) => {
         });
 
         res.header('Authorization', 'Bearer ' + token);
-        return res.status(200).json({ user: userResponse });
+        return res.status(200).json({ user: userResponse, token });
     } catch (error) {
         return res.status(501).json(error);
     }
