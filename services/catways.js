@@ -1,11 +1,15 @@
 const Catway = require('../models/catway');
 
-exports.getAll = async (req, res) => {
+// Obtenir tous les catways
+exports.getAll = async () => {
     try {
-        const catways = await Catway.find();
-        res.json(catways);
+        console.log('Début de getAll catways');
+        const catways = await Catway.find().lean();
+        console.log('Nombre de catways trouvés:', catways.length);
+        return catways;
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la récupération des catways' });
+        console.error('Erreur dans getAll catways:', error);
+        return [];
     }
 };
 

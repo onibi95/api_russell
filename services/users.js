@@ -95,9 +95,25 @@ exports.authenticate = async (req, res, next) => {
             { expiresIn: expireIn }
         );
 
+        // Stocker le token dans les cookies
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: expireIn * 1000
+        });
+
         res.header('Authorization', 'Bearer ' + token);
         return res.status(200).json({ user: userResponse });
     } catch (error) {
         return res.status(501).json(error);
+    }
+};
+
+// Obtenir tous les utilisateurs
+exports.getAllUsers = async () => {
+    try {
+        return await User.find({}, '-password');
+    } catch (error) {
+        throw error;
     }
 };
