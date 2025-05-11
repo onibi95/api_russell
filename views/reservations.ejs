@@ -197,9 +197,7 @@
                 return;
             }
 
-            // Vérifier si les réservations sont présentes
-            const reservations = <% - JSON.stringify(reservations || []) %>;
-            console.log('Réservations disponibles:', reservations);
+            // const reservations = <%- JSON.stringify(reservations || []) %>;
 
             loadCatways();
         });
@@ -208,23 +206,55 @@
         async function loadCatways() {
             try {
                 const token = localStorage.getItem('token');
+                console.log('Token utilisé:', token);
+
                 const response = await fetch('/api/catways', {
                     headers: {
-                        'Authorization': token
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
                     }
                 });
+
+                console.log('Réponse du serveur:', response.status);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Erreur serveur:', errorData);
+                    throw new Error('Erreur lors du chargement des catways');
+                }
+
                 const catways = await response.json();
+                console.log('Catways reçus:', catways);
+
                 const select = document.getElementById('catwayNumber');
                 select.innerHTML = '<option value="">Sélectionner un catway</option>';
 
-                catways.forEach(catway => {
+                // Filtrage insensible à la casse et aux espaces
+                const availableCatways = catways.filter(catway =>
+                    catway.catwayState && catway.catwayState.trim().toLowerCase() === 'bon état'
+                );
+                console.log('Catways disponibles:', availableCatways);
+
+                if (availableCatways.length === 0) {
+                    select.innerHTML = '<option value="">Aucun catway en bon état disponible</option>';
+                    select.disabled = false;
+                    return;
+                }
+
+                availableCatways.sort((a, b) => a.catwayNumber - b.catwayNumber);
+
+                availableCatways.forEach(catway => {
                     const option = document.createElement('option');
                     option.value = catway.catwayNumber;
                     option.textContent = `Catway ${catway.catwayNumber} (${catway.catwayType})`;
                     select.appendChild(option);
                 });
+                select.disabled = false;
             } catch (error) {
                 console.error('Erreur lors du chargement des catways:', error);
+                const select = document.getElementById('catwayNumber');
+                select.innerHTML = '<option value="">Erreur lors du chargement des catways</option>';
+                select.disabled = true;
             }
         }
 
@@ -238,7 +268,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': token
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         catwayNumber: parseInt(document.getElementById('catwayNumber').value),
@@ -251,7 +281,7 @@
 
                 if (response.ok) {
                     document.getElementById('reservationForm').reset();
-                    window.location.reload(); // Recharger la page pour voir les nouvelles données
+                    window.location.reload();
                     alert('Réservation créée avec succès');
                 } else {
                     const error = await response.json();
@@ -271,11 +301,11 @@
                     const response = await fetch(`/api/reservations/${id}`, {
                         method: 'DELETE',
                         headers: {
-                            'Authorization': token
+                            'Authorization': `Bearer ${token}`
                         }
                     });
                     if (response.ok) {
-                        window.location.reload(); // Recharger la page pour voir les changements
+                        window.location.reload();
                         alert('Réservation supprimée avec succès');
                     } else {
                         alert('Erreur lors de la suppression de la réservation');
@@ -293,7 +323,7 @@
                 const token = localStorage.getItem('token');
                 const response = await fetch(`/api/reservations/${id}`, {
                     headers: {
-                        'Authorization': token
+                        'Authorization': `Bearer ${token}`
                     }
                 });
                 const reservation = await response.json();
@@ -313,7 +343,7 @@
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Authorization': token
+                                'Authorization': `Bearer ${token}`
                             },
                             body: JSON.stringify({
                                 catwayNumber: parseInt(document.getElementById('catwayNumber').value),
@@ -326,8 +356,8 @@
 
                         if (updateResponse.ok) {
                             form.reset();
-                            form.onsubmit = null; // Réinitialiser le gestionnaire d'événements
-                            window.location.reload(); // Recharger la page pour voir les changements
+                            form.onsubmit = null;
+                            window.location.reload();
                             alert('Réservation mise à jour avec succès');
                         } else {
                             const error = await updateResponse.json();

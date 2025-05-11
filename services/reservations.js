@@ -1,8 +1,28 @@
 const Reservation = require('../models/reservation');
+const Catway = require('../models/catway');
 
 // Créer une nouvelle réservation
 exports.createReservation = async (reservationData) => {
     try {
+        // Vérifier l'état du catway
+        const catway = await Catway.findOne({ catwayNumber: reservationData.catwayNumber });
+        if (!catway) {
+            throw new Error('Catway non trouvé');
+        }
+        if (catway.catwayState !== 'bon état') {
+            throw new Error('Ce catway n\'est pas disponible pour réservation car il n\'est pas en bon état');
+        }
+
+        // Vérifier la disponibilité
+        const isAvailable = await this.checkCatwayAvailability(
+            reservationData.catwayNumber,
+            reservationData.startDate,
+            reservationData.endDate
+        );
+        if (!isAvailable) {
+            throw new Error('Le catway n\'est pas disponible pour cette période');
+        }
+
         const reservation = new Reservation(reservationData);
         return await reservation.save();
     } catch (error) {
