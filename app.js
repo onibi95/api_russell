@@ -1,3 +1,15 @@
+/**
+ * Configuration principale de l'application Express
+ * @module app
+ * @requires dotenv
+ * @requires express
+ * @requires path
+ * @requires cookie-parser
+ * @requires morgan
+ * @requires cors
+ * @requires mongoose
+ */
+
 require('dotenv').config()
 
 var express = require('express');
@@ -16,6 +28,10 @@ var mongodb = require('./db/mongoose');
 
 mongodb.initClientDbConnection();
 
+/**
+ * Instance de l'application Express
+ * @type {express.Application}
+ */
 var app = express();
 
 // Configuration des vues
@@ -46,17 +62,32 @@ app.use('/api/catways', catwaysRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/reservations', reservationsRouter);
 
-// Gestion des erreurs 404
+/**
+ * Middleware de gestion des erreurs 404
+ * @param {Object} req - L'objet requête Express
+ * @param {Object} res - L'objet réponse Express
+ * @param {Function} next - La fonction middleware suivante
+ */
 app.use(function (req, res, next) {
     res.status(404).json({ name: 'API', version: '1.0', status: 404, message: 'not-found' });
 });
 
-// Gestion des erreurs 500
+/**
+ * Middleware de gestion des erreurs 500
+ * @param {Error} err - L'erreur capturée
+ * @param {Object} req - L'objet requête Express
+ * @param {Object} res - L'objet réponse Express
+ * @param {Function} next - La fonction middleware suivante
+ */
 app.use(function (err, req, res, next) {
     console.error(err.stack);
     res.status(500).json({ name: 'API', version: '1.0', status: 500, message: 'Internal Server Error' });
 });
 
+/**
+ * Port sur lequel le serveur écoute
+ * @type {number}
+ */
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server Started on port ${PORT}`));
 
