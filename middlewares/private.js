@@ -1,6 +1,30 @@
+/**
+ * Middleware de vérification et gestion des tokens JWT
+ * @module middlewares/private
+ */
+
 var jwt = require('jsonwebtoken');
 var SECRET_KEY = process.env.SECRET_KEY;
 
+/**
+ * Middleware qui vérifie la présence et la validité du token JWT
+ * Gère le renouvellement automatique du token et définit les en-têtes appropriés
+ * 
+ * @async
+ * @function checkJWT
+ * @param {Object} req - L'objet requête Express
+ * @param {Object} req.headers - Les en-têtes de la requête
+ * @param {Object} req.cookies - Les cookies de la requête
+ * @param {Object} res - L'objet réponse Express
+ * @param {Function} next - La fonction middleware suivante
+ * @returns {void|Object} Redirige vers la page de connexion ou renvoie une réponse JSON en cas d'erreur
+ * 
+ * @example
+ * // Utilisation dans une route Express
+ * router.get('/protected-route', checkJWT, (req, res) => {
+ *   // Route protégée
+ * });
+ */
 exports.checkJWT = async (req, res, next) => {
     console.log('ROUTE:', req.originalUrl);
     console.log('HEADERS RECUS:', req.headers);
