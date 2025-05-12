@@ -49,10 +49,10 @@ router.get('/:id', private.checkJWT, service.getById);
 
 /**
  * Ajoute un nouvel utilisateur
- * @route PUT /api/users/add
+ * @route POST /api/users/
  * @returns {Object} Utilisateur créé
  */
-router.put('/add', service.add);
+router.post('/', service.add);
 
 /**
  * Met à jour un utilisateur existant
