@@ -17,6 +17,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
+var fs = require('fs');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -53,6 +54,18 @@ app.use(cors({
 
 // Fichiers statiques
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Route pour la documentation de l'API
+app.get('/api-docs', (req, res) => {
+    const docPath = path.join(__dirname, 'API_DOCUMENTATION.md');
+    fs.readFile(docPath, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send('Erreur lors de la lecture de la documentation');
+        }
+        res.setHeader('Content-Type', 'text/markdown');
+        res.send(data);
+    });
+});
 
 // Routes des vues (doivent être avant les routes API)
 app.use('/', indexRouter);
