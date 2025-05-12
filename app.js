@@ -48,7 +48,7 @@ app.use(cookieParser());
 // Configuration CORS
 app.use(cors({
     exposedHeaders: ['Authorization'],
-    origin: '*',
+    origin: process.env.CORS_ORIGIN || '*',
     credentials: true
 }));
 
@@ -101,7 +101,7 @@ app.use(function (err, req, res, next) {
  * Port sur lequel le serveur écoute
  * @type {number}
  */
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server Started on port ${PORT}`));
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, '0.0.0.0', () => console.log(`Server Started on port ${PORT}`));
 
 module.exports = app;
