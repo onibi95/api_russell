@@ -98,7 +98,7 @@ exports.authenticate = async (req, res, next) => {
         // Stocker le token dans les cookies
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: false,
             maxAge: expireIn * 1000
         });
 
